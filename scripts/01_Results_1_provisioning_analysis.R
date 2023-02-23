@@ -76,7 +76,7 @@ interaction_model_cooperation <- glmmTMB(provisioning_feeds ~
                                          REML = F,
                                          family='nbinom2',
                                          ziformula = ~ 1)
-summary(full_model_cooperation)  
+summary(interaction_model_cooperation)  
 
 # LRT for the interaction
 anova(interaction_model_cooperation, update(interaction_model_cooperation, .~.-age_cat : sex), test = "Chisq")
@@ -90,7 +90,7 @@ drop1(full_model_cooperation, test = "Chisq")
 
 ##
 ##
-##### Table of restults Model 1 #####
+##### Table of results S2 #####
 ##
 ##
 
@@ -132,7 +132,7 @@ table_cooperation <- table_cooperation00 %>%
 
 ##
 ## save table
-gtsave(table_cooperation, "./tables/TABLE1 - Provisioning.html")
+gtsave(table_cooperation, "./tables/TABLE S2 - Provisioning.html")
 
 
 ##
@@ -219,7 +219,7 @@ plot_cooperation_age <- ggplot(df_predict_ave,
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), 
         legend.position = "none",#c(0.5,0.85),
-        legend.position = "top",#c(0.5,0.85),
+        #legend.position = "top",#c(0.5,0.85),
         legend.text = element_text(family = "Arial", size = 15),
         legend.title = element_blank()) +
   scale_y_continuous(limits = c(0,20)) +
