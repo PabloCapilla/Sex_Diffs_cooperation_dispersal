@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 10/02/2023
+#' Last update 2023-09-04
 #' 
 ###
 ###
@@ -35,10 +35,28 @@ head(data)
 ##
 ##
 ##### sample sizes #####
+##
+##
+nrow(data) # observations
 length(unique(data$date)) # video sessions
 length(unique(data$ind_id)) # individuals
-length(unique(data$clutch_id)) # clutches
+length(unique(data$ind_id[data$sex == 'M'])) # males
+length(unique(data$ind_id[data$sex == 'F'])) # females
+length(unique(data$clutch_id)) # breeding attempts
 length(unique(data$group_id)) # groups
+
+data %>% 
+  group_by(clutch_id, date) %>% 
+  filter(row_number() == 1) %>% 
+  group_by(clutch_id) %>% 
+  summarise(n_days = n()) %>% 
+  summarise(min = min(n_days), 
+            max = max(n_days),
+            med = median(n_days))
+
+  
+
+
 
 table(data$season)
 table(data$ba_day)
@@ -76,6 +94,9 @@ interaction_model_cooperation <- glmmTMB(provisioning_feeds ~
                                          REML = F,
                                          family='nbinom2',
                                          ziformula = ~ 1)
+# zero-inflated negative binomial distribution accouinting for potential overdispersion, and zero inflation
+
+# model results
 summary(interaction_model_cooperation)  
 
 # LRT for the interaction
@@ -85,7 +106,6 @@ anova(interaction_model_cooperation, update(interaction_model_cooperation, .~.-a
 ## model without interaction
 full_model_cooperation <- update(interaction_model_cooperation, .~.-age_cat : sex)
 summary(full_model_cooperation)
-
 drop1(full_model_cooperation, test = "Chisq")
 
 ##
@@ -200,7 +220,7 @@ plot_cooperation_age <- ggplot(df_predict_ave,
                                              dodge.width = 0.5),
              shape = 21,
              size = 2.5,
-             alpha = 0.15) +
+             alpha = 0.10) +
   geom_errorbar(aes(ymin = fit - fit_se, ymax = fit + fit_se), 
                 width = 0,
                 position = position_dodge(width = 0.5)) +
@@ -211,14 +231,14 @@ plot_cooperation_age <- ggplot(df_predict_ave,
              position = position_dodge(width = 0.5)) + 
   theme_bw() +
   labs(x = "Subordinate age (years)", 
-       y = "Cooperative provisioning rate (feeds / hour)") + 
+       y = expression(atop("Cooperative provisioning rate", "(feeds / hour)"))) + 
   theme(axis.title.x = element_text(family = "Arial", color = "black", size = 15),
         axis.title.y = element_text(family = "Arial", color = "black", size = 15),
         axis.text.x = element_text(family = "Arial", color = "black", size = 12),
         axis.text.y = element_text(family = "Arial", color = "black", size = 12),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), 
-        legend.position = "none",#c(0.5,0.85),
+        legend.position = c(0.75,0.90),
         #legend.position = "top",#c(0.5,0.85),
         legend.text = element_text(family = "Arial", size = 15),
         legend.title = element_blank()) +
@@ -227,7 +247,10 @@ plot_cooperation_age <- ggplot(df_predict_ave,
   scale_color_manual(values = c("#9970ab", "#5aae61")) +
   scale_x_discrete(labels = c("< 1", "1 - 2", "2 - 3", "> 3"))
 
-ggsave(filename = "./plots/Figure 1a.png", 
+saveRDS(file = "./plots/Figure 1b.RDS", 
+        object = plot_cooperation_age)
+
+ggsave(filename = "./plots/Figure 1b.png", 
        plot = plot_cooperation_age, 
        units = "mm",
        device = "png", 

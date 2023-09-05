@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 10/02/2023
+#' Last update 2023-09-04
 #' 
 ###
 ###
@@ -77,9 +77,7 @@ prop.test(x = c(52, 30),
           alternative = "two.sided",
           correct = T)
 
-
-
-
+#####
 
 ##
 ##
@@ -97,10 +95,12 @@ interaction_model_dispersal <- glmer(disap ~
                                        na.action = "na.fail",
                                        family = "binomial", 
                                        glmerControl(optimizer = "bobyqa"))
-summary(interaction_model_dispersal)
-performance::check_model(interaction_model_dispersal)
-RVAideMemoire::overdisp.glmer(interaction_model_dispersal)
+# check model residuals
+model_residuals <- simulateResiduals(fittedModel = interaction_model_dispersal, n = 1000)
+DHARMa::testResiduals(model_residuals) # all tests look fairly okay
 
+# model results
+summary(interaction_model_dispersal)
 drop1(interaction_model_dispersal, test = "Chisq")
 
 # LRT for the interaction
@@ -115,9 +115,11 @@ full_model_dispersal <- update(interaction_model_dispersal,
 summary(full_model_dispersal)
 drop1(full_model_dispersal, test = "Chisq")
 
+#####
+
 ##
 ##
-##### Table of results S7 #####
+##### Table of results S1 #####
 ##
 ##
 
@@ -131,7 +133,7 @@ table_dispersal00 <- full_model_dispersal %>%
                  estimate_fun = ~ style_number(.x, digits = 3)) 
 
 ## add features
-table_dispersal <- table_dispersal00 %>% 
+table_dispersal_model <- table_dispersal00 %>% 
   add_global_p(anova_fun = drop1_output) %>% 
   bold_p(t = 0.05) %>% 
   bold_labels() %>%
@@ -157,8 +159,9 @@ table_dispersal <- table_dispersal00 %>%
 
 ##
 ## save table
-gtsave(table_dispersal, "./tables/TABLE S7 - Dispersal.html")
+gtsave(table_dispersal, "./tables/TABLE S1 - Dispersal.html")
 
+##### 
 
 ##
 ##
@@ -205,22 +208,22 @@ dispersal_plot <- ggplot(df_predict_sta,
              aes(y = disap,
                  x = age_cat,
                  color = sex_name),
-             position = position_jitterdodge(jitter.width = 0.1, 
+             position = position_jitterdodge(jitter.width = 0.15, 
                                              jitter.height = 0.02,
                                              dodge.width = 0.25),
-             size = 0.75,
-             alpha = 0.15) +
+             size = 2.5,
+             alpha = 0.10) +
   geom_errorbar(aes(ymin = (plow_resp), ymax = (phi_resp)), 
                 width = 0,
                 color = "black",
                 position = position_dodge(width = 0.25)) +
-  geom_point(size = 4,
+  geom_point(size = 5,
              shape = 21,
              color = "black",
              position = position_dodge(width = 0.25)) +
   theme_bw() +
   labs(x = "Subordinate age (years)", 
-       y = "Probability of dispersal from natal territory") + 
+       y = expression(atop("Probability of dispersal", "from natal territory"))) + 
   theme(axis.title.x = element_text(family = "Arial", color = "black", size = 15),
         axis.title.y = element_text(family = "Arial", color = "black", size = 15),
         axis.text.x = element_text(family = "Arial", color = "black", size = 12),
@@ -234,7 +237,10 @@ dispersal_plot <- ggplot(df_predict_sta,
   scale_color_manual(values = c("#9970ab", "#5aae61")) +
   scale_x_discrete(labels = c("< 1", "1 - 2", "2 - 3", "> 3"))
 
-ggsave(filename = "./plots/Figure 1b.png", 
+saveRDS(file = "./plots/Figure 1a.RDS", 
+        object = dispersal_plot)
+
+ggsave(filename = "./plots/Figure 1a.png", 
        plot = dispersal_plot, 
        units = "mm",
        device = "png", 

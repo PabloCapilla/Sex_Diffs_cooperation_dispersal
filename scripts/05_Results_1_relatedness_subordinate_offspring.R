@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 10/02/2023
+#' Last update 2023-09-04
 #' 
 ###
 ###
@@ -29,8 +29,15 @@ source("../prep_repository/R_library/FUNCTION_drop1_output.R")
 ##### data #####
 ##
 ##
-data <- readRDS(file = "data/06_relatedness_analysis_data.RDS")
+data <- readRDS(file = "data/05_relatedness_analysis_data.RDS")
 head(data)
+
+## sample sizes
+nrow(data) # total obs
+length(unique(data$sub_id)) # number of subs
+length(unique(data$sub_id[data$sub_sex == 'M'])) # number of male subs
+length(unique(data$sub_id[data$sub_sex == 'F'])) # number of female subs
+
 
 ##
 ##
@@ -41,7 +48,7 @@ model_relatedness <- lmer(rel_to_offspring ~ sub_sex + (1|clutch_id),
                         data = data,
                         na.action = "na.fail")
 summary(model_relatedness)
-
+drop1(model_relatedness, test = 'Chisq')
 
 
 ## base table
@@ -81,7 +88,87 @@ table_relatedness <- table_relatedness00 %>%
 
 ##
 ## save table
-gtsave(table_relatedness, "./tables/TABLE S6 - Relatedness Subordinate to offspring.html")
+gtsave(table_relatedness, "./tables/TABLE S5 - Relatedness Subordinate to offspring.html")
+
+#####
+
+##
+##
+##### plotting age trajectories #####
+##
+##
+df_predict <- expand.grid(
+  sub_sex = c("F", "M")
+)
+
+df_predict$fit <- predict(model_relatedness, 
+                              df_predict, 
+                              re.form = NA, 
+                              type = "link")
+mm <- model.matrix(~
+                     sub_sex,
+                   data = df_predict)
+
+pvar1 <- diag(mm %*% tcrossprod(vcov(model_relatedness),mm))
+cmult <- 1 ## could use 1.96
+df_predict <- data.frame(
+  df_predict
+  , plo = df_predict$fit-cmult*sqrt(pvar1)
+  , phi = df_predict$fit+cmult*sqrt(pvar1)
+)
+
+
+df_predict$sex_name <- ifelse(df_predict$sub_sex == "F", "female", "male")
+data$sex_name <- ifelse(data$sub_sex == "F", "female", "male")
+
+
+##
+## individual prob of helping
+plot_relatedness <- ggplot(df_predict,
+                         aes(y = fit, 
+                             x = sex_name,
+                             color = sex_name, 
+                             fill = sex_name)) +
+  geom_point(data = data,
+             aes(y = rel_to_offspring,
+                 x = sex_name,
+                 color = sex_name),
+             position = position_jitter(width = 0.2),
+             size = 2.5,
+             alpha = 0.10) +
+  geom_errorbar(aes(ymin = plo, ymax = phi), 
+                width = 0,
+                color = "black",
+                position = position_dodge(width = 0.25)) +
+  geom_point(size = 5,
+             shape = 21,
+             color = "black",
+             position = position_dodge(width = 0.25)) +
+  theme_bw() +
+  labs(x = " ", 
+       y = expression(atop("Relatedness", "subordinate to offspring"))) + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_text(family = "Arial", color = "black", size = 15),
+        axis.text.x = element_text(family = "Arial", color = "black", size = 12),
+        axis.text.y = element_text(family = "Arial", color = "black", size = 12),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        legend.position = "none",
+        legend.text = element_text(family = "Arial", size = 10),
+        legend.title = element_blank()) +
+  scale_fill_manual(values = c("#9970ab", "#5aae61")) +
+  scale_color_manual(values = c("#9970ab", "#5aae61")) 
+
+saveRDS(file = "./plots/Figure 1e.RDS", 
+        object = plot_relatedness)
+
+ggsave(filename = "./plots/Figure 1e.png", 
+       plot = plot_relatedness, 
+       units = "mm",
+       device = "png", 
+       width = 85,
+       height = 115)
+
 
 
 
