@@ -56,8 +56,8 @@ b_id <- b_id %>%
 ##
 
 # distance
-distance_value <- seq(from = 50,
-                      to = 350, 
+distance_value <- seq(from = 100,
+                      to = 300, 
                       by = 25)
 
 # collecting data

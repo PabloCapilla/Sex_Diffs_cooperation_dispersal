@@ -38,6 +38,15 @@ length(unique(data$bird_id))
 ## initial forays
 sum(data$forays)
 
+## time of deployments
+data %>% 
+  mutate(date = ymd('2016-12-31')+day) %>% 
+  group_by(bird_id) %>% 
+  summarise(min_date = min(date), 
+            max_date = max(date)) %>% 
+  summarise(latest_recodings = max(max_date))
+
+
 #####
 
 ##

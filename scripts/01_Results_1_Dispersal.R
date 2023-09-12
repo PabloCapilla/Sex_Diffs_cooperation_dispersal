@@ -44,6 +44,7 @@ data$age_cat <- as.factor(ifelse(data$age < b_points[1], 1,                   # 
 
 unique(data$age_cat)
 length(unique(data$bird_id))
+length(unique(data$natal_group))
 
 #####
 
