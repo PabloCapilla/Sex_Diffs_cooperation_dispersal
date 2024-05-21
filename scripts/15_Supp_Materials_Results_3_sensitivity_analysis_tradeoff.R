@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-02-10
+#' Last update 2024-05-21
 #' 
 ###
 ###
@@ -77,7 +77,9 @@ prov <- prov %>%
   mutate(bird_date = paste(ind_id, date, sep = "_"))
 
 # filtering prov data
-prov_prov <- prov[prov$bird_date %in% prospect_bird_day,]
+prov_prov <- prov[prov$bird_date %in% prospect_bird_day,] %>% 
+  group_by(ind_id, date) %>% 
+  filter(row_number() == 1)
 
 # merging data sets
 length(unique(prov_prov$ind_id)) 
@@ -203,7 +205,7 @@ tradeoff_sensi <- ggplot(data = tbl_df,
 
 #####
 
-ggsave(filename = "./plots/Figure_S3.png", 
+ggsave(filename = "./plots/Figure_S2.png", 
        plot = tradeoff_sensi, 
        units = "mm",
        device = "jpeg", 

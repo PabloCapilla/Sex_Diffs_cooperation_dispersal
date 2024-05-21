@@ -56,8 +56,8 @@ b_id <- b_id %>%
 ##
 
 # distance
-distance_value <- seq(from = 100,
-                      to = 300, 
+distance_value <- seq(from = 200,
+                      to = 350, 
                       by = 25)
 
 # collecting data
@@ -112,19 +112,37 @@ for (d in 1:length(distance_value)){
   data_days$obs_id <- 1:nrow(data_days)
   data_days$age_years <- data_days$age_days/365
   
-  # model
-  model_loop <- glmer(total_foray_day ~
-                        sex_name +
-                        prov +
-                        age_years +
-                        (1|obs_id) + 
-                        (1|bird_id) + 
-                        (1|home),
-                      data = data_days,
-                      family = "poisson",
-                      na.action = "na.fail")
+  # model < 325 with obs_ID random effect
+  if(distance_value[d] < 320) {
+    model_loop <- glmer(total_foray_day ~
+                          sex_name +
+                          prov +
+                          age_years +
+                          (1|obs_id) + 
+                          (1|bird_id) + 
+                          (1|home),
+                        data = data_days,
+                        family = "poisson",
+                        na.action = "na.fail")
+  } else {
+    model_loop <- glmer(total_foray_day ~
+                          sex_name +
+                          prov +
+                          age_years +
+                          #(1|obs_id) + 
+                          (1|bird_id) + 
+                          (1|home),
+                        data = data_days,
+                        family = "poisson",
+                        na.action = "na.fail")
+  }
+  
 
-    tbl_df$n_forays[d] <- n_forays
+#summary(model_loop)
+#res_sim <- DHARMa::simulateResiduals(model_loop, n = 500)
+#testResiduals(res_sim)
+  
+  tbl_df$n_forays[d] <- n_forays
   tbl_df$sex_coef[d] <- {summary(model_loop)}$coefficients[2,1]
   tbl_df$se_sex_coef[d] <- {summary(model_loop)}$coefficients[2,2]
   tbl_df$p_sex[d] <- {summary(model_loop)}$coefficients[2,4]
@@ -159,7 +177,7 @@ n_forays <- ggplot(data = tbl_df,
         legend.position = "none",
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) +
-  scale_x_continuous(breaks = seq( 50,350,100), labels = seq( 50,350,100))
+  scale_x_continuous(breaks = seq(200,350,50), labels = seq(200,350,50)) 
 
 # plot for sex effect
 sex_sensi <- ggplot(data = tbl_df,
@@ -185,8 +203,10 @@ sex_sensi <- ggplot(data = tbl_df,
         legend.position = "none",
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) +
-  scale_y_continuous(limits = c(-0.60,0.60), breaks = seq(-0.60, 0.60, 0.20), labels = round(seq(-0.60, 0.60, 0.20), digits = 1)) +
-  scale_x_continuous(breaks = seq( 50,350,100), labels = seq( 50,350,100))
+  scale_y_continuous(limits = c(-0.80,0.80), 
+                     breaks = seq(-0.80, 0.80, 0.20), 
+                     labels = round(seq(-0.80, 0.80, 0.20), digits = 1)) +
+  scale_x_continuous(breaks = seq(200,350,50), labels = seq(200,350,50)) 
 
 # plot for prov effect
 prov_sensi <- ggplot(data = tbl_df,
@@ -215,15 +235,14 @@ prov_sensi <- ggplot(data = tbl_df,
   scale_y_continuous(limits = c(-0.40,0.40), 
                      breaks = seq(-0.40, 0.40, 0.20), 
                      labels = round(seq(-0.40, 0.40, 0.20), digits = 1)) +
-  scale_x_continuous(breaks = seq( 50,350,100), labels = seq( 50,350,100))
+  scale_x_continuous(breaks = seq(200,350,50), labels = seq(200,350,50)) 
 
 
 
 Figure_sensi <- ggdraw() +
-  draw_plot(n_forays, x = 0.00, y = 0.00, width = 0.33, height = 1.00) +
-  draw_plot(sex_sensi, x = 0.33, y = 0.00, width = 0.33, height = 1.00) +
-  draw_plot(prov_sensi, x = 0.66, y = 0.00, width = 0.33, height = 1.00) +
-  draw_plot_label(label = c("A", "B", 'C'), size = 15, x = c(0.00, 0.33, 0.66), y = c(1, 1, 1)) +
+  draw_plot(n_forays, x = 0.00, y = 0.00, width = 0.50, height = 1.00) +
+  draw_plot(sex_sensi, x = 0.50, y = 0.00, width = 0.50, height = 1.00) +
+  draw_plot_label(label = c("A", "B"), size = 15, x = c(0.00, 0.50), y = c(1, 1)) +
   draw_label('Distance threshold used to assign prospecting forays', 
              colour = "black", 
              size = 15, angle = 0, x = 0.5, y = 0.05)
@@ -231,11 +250,11 @@ Figure_sensi <- ggdraw() +
 
 #####
 
-ggsave(filename = "./plots/Figure_S2.png", 
+ggsave(filename = "./plots/Figure_S4.png", 
        plot = Figure_sensi, 
        units = "mm",
        device = "jpeg", 
-       width = 200,
+       width = 170,
        height = 125)
 
 

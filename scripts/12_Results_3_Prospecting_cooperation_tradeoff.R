@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-05
+#' Last update 2024-05-21
 #' 
 ###
 ###
@@ -33,6 +33,10 @@ source("../prep_repository/R_library/FUNCTION_gather_dist_data.R")
 data <- readRDS(file = "./data/10_prospecting_cooperation_individual.RDS")
 head(data)
 
+# sample sizes
+length(unique(data$date))
+length(unique(data$group_id))
+
 
 #####
 
@@ -59,6 +63,7 @@ tradeoff_full_model <- glmer(provisioning_feeds ~
                              data = data,
                              offset = log(data$session_duration),
                              family = 'poisson',
+                             glmerControl(optimizer = 'bobyqa'),
                              na.action = "na.fail")
 # inspecting model residuals
 simul_res <- simulateResiduals(fittedModel = tradeoff_full_model, n = 1000)
@@ -69,6 +74,7 @@ drop1(tradeoff_full_model, test = "Chisq")
 
 
 ## model without interaction
+
 tradeoff_model_poisson <- glmer(provisioning_feeds ~ 
                                   foray_rate_before +
                                   nestlings +
@@ -78,10 +84,15 @@ tradeoff_model_poisson <- glmer(provisioning_feeds ~
                                   (1|ind_id),
                                 data = data,
                                 offset = log(data$session_duration),
+                                glmerControl(optimizer = 'bobyqa'),
                                 family = 'poisson',
                                 na.action = "na.fail")
 drop1(tradeoff_model_poisson, test = "Chisq")
-summary(tradeoff_model)
+summary(tradeoff_model_poisson)
+
+plot(tradeoff_model_poisson)
+hist(residuals(tradeoff_model_poisson))
+
 #####
 
 ##
@@ -131,7 +142,7 @@ table_tradeoff <- table_tradeoff00 %>%
 
 ##
 ## save table
-gtsave(table_tradeoff, "./tables/TABLE S20 - Trade off.html")
+gtsave(table_tradeoff, "./tables/TABLE S11 - Trade off.html")
 
 #####
 
@@ -181,10 +192,10 @@ tradeoff_plot <- ggplot(df_predict,
   geom_point(data = data,
              aes(y = provisioning_rate, x = foray_rate_before),
              shape =21,
-             size = 2.5, 
+             size = 5, 
              alpha =1,
              color = 'black',
-             fill = 'white',
+             fill = 'grey75',
              position = position_jitter(width = 0.05)) +
   geom_line(size = 1.5) + 
   geom_ribbon(aes(ymin = low_resp, 

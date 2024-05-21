@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-05
+#' Last update 2024-05-17
 #' 
 ###
 ###
@@ -34,6 +34,7 @@ data <- readRDS(file = "./data/09_prospecting_list_250m_15s.RDS")
 data$sex_name <- ifelse(data$sex == "FEMALE", "female", "male")
 data$age_years <- data$age_days/365
 length(unique(data$bird_id)) # number of birds
+nrow(data)
 head(data)
 
 
@@ -139,7 +140,86 @@ gtsave(table_distance, "./tables/TABLE S18 - Prospecting duration.html")
 
 ##
 ##
-##### Plot to show data #####
+##### Plot #####
+##
+##
+
+##
+## plot predictions
+df_predict <- expand.grid(
+  sex_name = c("female", "male"),
+  prov = c("NO", "YES"),
+  age_years = mean(data$age_days)/365
+)
+
+# model predictions
+df_predict$fit <- predict(foray_duration_model, 
+                          df_predict, 
+                          re.form = NA, 
+                          type = "link")
+
+mm <- model.matrix(~sex_name +
+                     prov +
+                     age_years,
+                   data = df_predict)
+
+pvar1 <- diag(mm %*% tcrossprod(vcov(foray_duration_model),mm))
+cmult <- 1 ## could use 1.96
+df_predict <- data.frame(
+  df_predict
+  , plo = df_predict$fit-cmult*sqrt(pvar1)
+  , phi = df_predict$fit+cmult*sqrt(pvar1)
+)
+df_predict$fit_resp <- exp(df_predict$fit)
+df_predict$plow_resp <- exp(df_predict$plo)
+df_predict$phi_resp <- exp(df_predict$phi)
+data_days$sex_name <- ifelse(data$sex == "FEMALE", "female", "male")
+
+##
+## individual prob of helping
+duration_plot <- ggplot(df_predict,
+                           aes(x = prov, 
+                               fill = sex_name,
+                               color = sex_name,
+                               y = fit_resp)) + 
+  geom_errorbar(aes(ymin = (plow_resp), 
+                    ymax = (phi_resp), 
+                    group = sex_name), 
+                width = 0,
+                color= "black",
+                position = position_dodge(width = 0.5)) +
+  geom_point(size = 5, 
+             shape = 21,
+             color= "black",
+             position = position_dodge(width = 0.5)) + 
+  theme_bw() +
+  labs(y = expression(atop("Foray duration", "(minutes)")), 
+       x = "\nProvisioning") + 
+  theme(axis.title.x = element_text(family = "Arial", color = "black", size = 15),
+        axis.title.y = element_text(family = "Arial", color = "black", size = 15),
+        axis.text.x = element_text(family = "Arial", color = "black", size = 12),
+        axis.text.y = element_text(family = "Arial", color = "black", size = 12),
+        legend.position = "none",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  scale_fill_manual(values = c("#9970ab", "#5aae61")) +
+  scale_color_manual(values = c("#9970ab", "#5aae61"), name = c("", ""))
+
+saveRDS(file = "./plots/Figure 3c.RDS", 
+        object = duration_plot)
+
+ggsave(filename = "./plots/Figure_3c.png", 
+       plot = duration_plot, 
+       units = "mm",
+       device = "png", 
+       width = 89,
+       height = 89)
+
+#####
+
+##
+##
+##### data histograms #####
 ##
 ##
 table(data$time_next_home/60 >150, data$sex)
@@ -148,7 +228,7 @@ data_plot <- data %>%
   mutate(duration_plot2 = ifelse(time_next_home/60 >150, 151, time_next_home/60))
 
 
-durations_plot <- ggplot(data_plot,
+durations_histogram <- ggplot(data_plot,
        aes(x = duration_plot2, fill = sex_name)) +
   geom_histogram(binwidth = 10) +
   facet_grid(sex_name~.) +
@@ -165,16 +245,3 @@ durations_plot <- ggplot(data_plot,
   scale_fill_manual(values = c("#9970ab", "#5aae61")) +
   scale_x_continuous(labels = c('0','25', '50', '75', '100', '125', '> 150'), breaks = seq(0,150, 25)) +
   labs(y = 'Count of forays\n', x = expression(atop('Foray duration', '(minutes)')))
-
-
-saveRDS(file = "./plots/Figure 3c.RDS", 
-        object = durations_plot)
-
-ggsave(filename = "./plots/Figure_3c.png", 
-       plot = durations_plot, 
-       units = "mm",
-       device = "png", 
-       width = 300,
-       height = 150)
-
-

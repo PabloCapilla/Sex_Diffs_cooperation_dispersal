@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-04
+#' Last update 2024-05-17
 #' 
 ###
 ###
@@ -171,6 +171,8 @@ head(data_days)
 ##
 range(data_days$total_foray_day)
 nrow(data_days)
+length(unique(data_days$day))
+length(unique(data_days$home))
 length(unique(data_days$bird_id))
 mean(data_days$total_foray_day)
 median(data_days$total_foray_day) 
@@ -212,6 +214,7 @@ testUniformity(res_poisson)
 testZeroInflation(res_poisson)
 
 
+
 ##
 ## model without interaction
 prospecting_model <- glmer(total_foray_day ~
@@ -226,6 +229,9 @@ prospecting_model <- glmer(total_foray_day ~
                            na.action = "na.fail")
 drop1(prospecting_model, test = "Chisq")
 summary(prospecting_model)
+
+
+
 
 #####
 

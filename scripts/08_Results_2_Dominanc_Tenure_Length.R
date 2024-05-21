@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-04
+#' Last update 2024-05-21
 #' 
 ###
 ###
@@ -45,19 +45,17 @@ dom_in_natal_prebudding <- table(data$dom_in_natal, data$SEX)
 ##
 ## including dominance via budding
 data_budding <- read.csv(file = "./data/07_dominance_via_budding.csv") # data
-data_budding <- data_budding %>% filter(DISCARDED == "no") # removing one female that budded being dominant already (from Dassie to Canary)
+data_budding <- data_budding 
 
 ## changing budded males to dominance acq in turnover table
 
 # males that budded to become dominants
 budded_males <- {data_budding %>% 
-    filter(Start.Context_dom_male == "HATCHED") %>% 
     filter(budded_dom_male == 1) %>% 
     select(X1st_dom_male)}$X1st_dom_male
 
 # females that budded to become dominants
 budded_females <- {data_budding %>% 
-    filter(Start.Context_dom_female == "HATCHED") %>% 
     filter(budded_dom_female == 1) %>% 
     select(X1st_dom_female)}$X1st_dom_female
 
@@ -114,6 +112,8 @@ data_ten <- all_inh_ind %>%
   mutate(dom_age = ymd(dominant_start) - dmy(BBBirthday)) %>% 
   filter(age_fate > (365/2))
 
+table(data_ten$SEX)
+
 # means
 data_ten %>% 
   group_by(SEX) %>% 
@@ -122,6 +122,11 @@ data_ten %>%
             min_tenure = min(dom_tenure/365),
             max_tenure = max(dom_tenure/365))
 
+
+t_test <- lm(dom_tenure ~ 
+     SEX ,
+   data = data_ten)
+summary(t_test)
 
 # model
 ten_model_full <- lmer(dom_tenure ~ 
