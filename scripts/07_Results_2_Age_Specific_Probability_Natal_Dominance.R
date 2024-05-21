@@ -260,7 +260,7 @@ dom_acq_natal <- ggplot(df,
         legend.title = element_blank()) +
   scale_fill_manual(values = c("#9970ab", "#5aae61")) +
   scale_color_manual(values = c("#9970ab", "#5aae61")) +
-  scale_x_discrete(labels = c("< 1", "< 2", "< 3", "> 3"))
+  scale_x_discrete(labels = c("1", "2", "3", "4"))
 
 ggsave(filename = "./plots/Figure 2.png", 
        plot = dom_acq_natal, 
