@@ -261,5 +261,5 @@ table_em_sub <- table_em_sub00 %>%
 
 ##
 ## save table
-gtsave(table_em_sub, "./tables/TABLE S12 - Probability of emigrating to subordinate position.html")
+gtsave(table_em_sub, "./tables/TABLE S10 - Probability of emigrating to subordinate position.html")
 

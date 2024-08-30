@@ -134,7 +134,7 @@ table_distance <- table_distance00 %>%
 
 ##
 ## save table
-gtsave(table_distance, "./tables/TABLE S9 - Prospecting duration.html")
+gtsave(table_distance, "./tables/TABLE S7 - Prospecting duration.html")
 
 #####
 

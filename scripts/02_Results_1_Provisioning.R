@@ -152,7 +152,7 @@ table_cooperation <- table_cooperation00 %>%
 
 ##
 ## save table
-gtsave(table_cooperation, "./tables/TABLE S2 - Provisioning.html")
+gtsave(table_cooperation, "./tables/TABLE 2 - Provisioning.html")
 
 
 ##

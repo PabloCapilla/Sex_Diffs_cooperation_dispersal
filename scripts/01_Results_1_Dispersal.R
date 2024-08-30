@@ -160,7 +160,7 @@ table_dispersal_model <- table_dispersal00 %>%
 
 ##
 ## save table
-gtsave(table_dispersal_model, "./tables/TABLE S1 - Dispersal.html")
+gtsave(table_dispersal_model, "./tables/TABLE 1 - Dispersal.html")
 
 ##### 
 

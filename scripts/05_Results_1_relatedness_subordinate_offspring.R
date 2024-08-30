@@ -88,7 +88,7 @@ table_relatedness <- table_relatedness00 %>%
 
 ##
 ## save table
-gtsave(table_relatedness, "./tables/TABLE S5 - Relatedness Subordinate to offspring.html")
+gtsave(table_relatedness, "./tables/TABLE S3 - Relatedness Subordinate to offspring.html")
 
 #####
 

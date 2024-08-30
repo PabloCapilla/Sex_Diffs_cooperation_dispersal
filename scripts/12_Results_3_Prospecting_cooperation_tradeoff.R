@@ -132,7 +132,7 @@ table_tradeoff <- table_tradeoff00 %>%
 
 ##
 ## save table
-gtsave(table_tradeoff, "./tables/TABLE S11 - Trade off.html")
+gtsave(table_tradeoff, "./tables/TABLE S9 - Trade off.html")
 
 #####
 

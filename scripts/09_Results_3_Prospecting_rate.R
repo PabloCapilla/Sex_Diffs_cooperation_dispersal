@@ -282,7 +282,7 @@ table_prospecting <- table_prospecting00 %>%
 
 ##
 ## save table
-gtsave(table_prospecting, "./tables/TABLE S8 - Prospecting rate.html")
+gtsave(table_prospecting, "./tables/TABLE S6 - Prospecting rate.html")
 
 #####
 

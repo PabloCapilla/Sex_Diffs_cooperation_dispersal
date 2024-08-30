@@ -100,7 +100,7 @@ drop1(full_model_prey_item, test = "Chisq")
 
 ##
 ##
-##### Table of results S4 #####
+##### Table of results S2 #####
 ##
 ##
 
@@ -144,7 +144,7 @@ table_prey_type <- table_prey_type00 %>%
 
 ##
 ## save table
-gtsave(table_prey_type, "./tables/TABLE S4 - Prey Type.html")
+gtsave(table_prey_type, "./tables/TABLE S2 - Prey Type.html")
 
 #####
 

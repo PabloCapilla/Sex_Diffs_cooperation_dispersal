@@ -179,7 +179,7 @@ table_natal_turn_over <- table_natal_turn_over00 %>%
 
 ##
 ## save table
-table_name <- paste0("./tables/TABLE S6 - Dominance acquisition natal.html")
+table_name <- paste0("./tables/TABLE S4 - Dominance acquisition natal.html")
 gtsave(table_natal_turn_over, table_name)
 
 #####  
@@ -399,7 +399,7 @@ table_natal_turn_over <- table_natal_turn_over00 %>%
 
 ##
 ## save table
-table_name <- paste0("./tables/TABLE S7 - budding dominance acquisition natal.html")
+table_name <- paste0("./tables/TABLE S5 - budding dominance acquisition natal.html")
 gtsave(table_natal_turn_over, table_name)
 
 #####

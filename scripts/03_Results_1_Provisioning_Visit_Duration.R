@@ -144,7 +144,7 @@ table_duration <- table_cooperation00 %>%
 
 ##
 ## save table
-gtsave(table_duration, "./tables/TABLE S3 - Feed duration.html")
+gtsave(table_duration, "./tables/TABLE S1 - Feed duration.html")
 
 #####
 
