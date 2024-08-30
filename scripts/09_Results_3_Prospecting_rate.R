@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2024-05-17
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -54,7 +54,7 @@ data %>%
 ##### Add weight of tagged ind #####
 ##
 ##
-captures <- read.csv('../prep_repository/raw_data/All CAPTURES_adults_Maria.csv')
+captures <- read.csv('./data/captures.csv')
 captures <- captures %>% 
   select(Date, BIRD.ID, Weight) %>% 
   mutate(Date = dmy(Date))
@@ -194,6 +194,8 @@ summary(lm(age ~ sex_name,
 
 
 # full model
+table(data_days$age_years)
+
 prospecting_full_model <- glmer(total_foray_day ~
                                   sex_name : prov +
                                   sex_name +
@@ -280,7 +282,7 @@ table_prospecting <- table_prospecting00 %>%
 
 ##
 ## save table
-gtsave(table_prospecting, "./tables/TABLE S17 - Prospecting rate.html")
+gtsave(table_prospecting, "./tables/TABLE S8 - Prospecting rate.html")
 
 #####
 

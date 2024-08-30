@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-04
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -171,7 +171,7 @@ df_predict$fit <-  predict(object = full_model_prey_item,
                            newdata = df_predict,
                            newparams = NULL,
                            re.form = NA,
-                           type = c("response"))
+                           type = c("link"))
 
 mm <- model.matrix(~
                      age_cat +
@@ -200,6 +200,7 @@ df_predict_ave <- df_predict %>%
             fit_lo = mean(plow_resp, na.rm = T),
             fit_hi = mean(phi_resp, na.rm = T))
 df_predict_ave$sex_name <- ifelse(df_predict_ave$sex == "F", "female", "male")
+
 
 
 ##

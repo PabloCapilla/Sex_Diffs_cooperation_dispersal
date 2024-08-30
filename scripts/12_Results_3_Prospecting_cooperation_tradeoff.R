@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2024-05-21
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -51,29 +51,9 @@ length(unique(data$bird_id[data$sex == 'F']))
 ##
 ##
 
-## model 1: rate of morning forays continuous
-tradeoff_full_model <- glmer(provisioning_feeds ~ 
-                               foray_rate_before : sex +
-                               foray_rate_before +
-                               nestlings +
-                               ba_day + 
-                               sex +
-                               (1|group_id) + 
-                               (1|ind_id),
-                             data = data,
-                             offset = log(data$session_duration),
-                             family = 'poisson',
-                             glmerControl(optimizer = 'bobyqa'),
-                             na.action = "na.fail")
-# inspecting model residuals
-simul_res <- simulateResiduals(fittedModel = tradeoff_full_model, n = 1000)
-testResiduals(simul_res)
-
-summary(tradeoff_full_model)
-drop1(tradeoff_full_model, test = "Chisq")
-
 
 ## model without interaction
+table(data$ba_day)
 
 tradeoff_model_poisson <- glmer(provisioning_feeds ~ 
                                   foray_rate_before +
@@ -87,8 +67,18 @@ tradeoff_model_poisson <- glmer(provisioning_feeds ~
                                 glmerControl(optimizer = 'bobyqa'),
                                 family = 'poisson',
                                 na.action = "na.fail")
+# inspecting model residuals
+simul_res <- simulateResiduals(fittedModel = tradeoff_model_poisson, n = 1000)
+testDispersion(simul_res)
+testResiduals(simul_res)
+
+
 drop1(tradeoff_model_poisson, test = "Chisq")
 summary(tradeoff_model_poisson)
+
+## double check results with brood age is included as a category
+drop1(update(tradeoff_model_poisson, . ~ . - ba_day + as.factor(ba_day)),test = "Chisq")
+
 
 plot(tradeoff_model_poisson)
 hist(residuals(tradeoff_model_poisson))

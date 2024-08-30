@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-04
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -160,7 +160,7 @@ table_dispersal_model <- table_dispersal00 %>%
 
 ##
 ## save table
-gtsave(table_dispersal, "./tables/TABLE S1 - Dispersal.html")
+gtsave(table_dispersal_model, "./tables/TABLE S1 - Dispersal.html")
 
 ##### 
 

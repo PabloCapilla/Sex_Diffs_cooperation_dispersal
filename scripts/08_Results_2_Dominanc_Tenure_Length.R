@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2024-05-21
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -183,7 +183,7 @@ tenure_model <- tenure_model00 %>%
 
 ##
 ## save table
-gtsave(tenure_model, "./tables/TABLE S14 - Dominance tenure length.html")
+#gtsave(tenure_model, "./tables/TABLE S14 - Dominance tenure length.html")
 
 #####
 
@@ -261,70 +261,5 @@ table_em_sub <- table_em_sub00 %>%
 
 ##
 ## save table
-gtsave(table_cooperation, "./tables/TABLE S15 - Probability of emigrating to subordinate position.html")
+gtsave(table_em_sub, "./tables/TABLE S12 - Probability of emigrating to subordinate position.html")
 
-
-##
-## emigrate to become dominants?
-df_move$natal_move_to_dom <- ifelse(df_move$EM_group == df_move$dominant_territory, 1, 0)
-df_move$natal_move_to_dom[is.na(df_move$natal_move_to_dom)] <- 0
-initial_numbers_dom <- table(df_move$natal_move_to_dom, df_move$SEX)
-
-# refine for those that became dominant in the first group they first moved to but after a while
-for(i in 1:nrow(df_move)) {
-  moved_to_dom <- df_move$natal_move_to_dom[i]
-  
-  if(moved_to_dom == 0){
-    next()
-  } else {
-    df_move$natal_move_to_dom[i] <- ifelse(df_move$time_to_dom[i] > 14, 0, 1)
-  }
-}
-final_numbers_dom <- table(df_move$natal_move_to_dom, df_move$SEX)
-
-## analysis of probability to emigrate to dominant position
-model_em_dom <- glmer(natal_move_to_dom ~ 
-                        SEX +
-                        (1|Season) +
-                        (1|GROUP),
-                      data = df_move, 
-                      family = 'binomial')
-summary(model_em_dom)
-drop1(model_em_dom, test = 'Chisq')
-
-## base table
-table_em_dom00 <- model_em_dom %>%
-  tbl_regression(intercept = T,
-                 label = list(
-                   `(Intercept)` = "Intercept",
-                   SEX = "Sex"),
-                 estimate_fun = ~ style_number(.x, digits = 3)) 
-
-## add features
-table_em_dom <- table_em_dom00 %>% 
-  add_global_p(anova_fun = drop1_output) %>% 
-  bold_p(t = 0.05) %>% 
-  bold_labels() %>%
-  italicize_levels() %>% 
-  modify_table_body(fun = function(.){
-    output <- left_join(x = .,
-                        y = drop1_output(x=model_em_dom) %>% 
-                          dplyr::select(variable = term, Chisq=statistic, df),
-                        by = "variable")
-    output$df <- ifelse(output$row_type == "label",  output$df, NA)
-    output$Chisq <- ifelse(output$row_type == "label",  output$Chisq, NA)
-    return(output)
-  }) %>% 
-  modify_fmt_fun(c(Chisq) ~ function(x) style_number(x, digits = 2)) %>%
-  modify_table_body(~.x %>% dplyr::relocate(p.value, .after = df)) %>% 
-  modify_header(label ~ "**Fixed effect**") %>% 
-  modify_header(std.error ~ "**SE**") %>%
-  modify_header(estimate ~ "**Estimate**") %>%
-  modify_header(df ~ "**df**") %>% 
-  modify_header(Chisq ~ html("<b>&chi;<sup>2</sup></b>")) %>% 
-  as_gt() %>% 
-  opt_footnote_marks(marks = "LETTERS")
-
-##
-## save table
-gtsave(table_em_dom, "./tables/TABLE S16 - Probability of emigrating to dominant position.html")

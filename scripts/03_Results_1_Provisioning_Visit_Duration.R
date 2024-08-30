@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023-09-04
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -227,7 +227,7 @@ plot_feed_duration <- ggplot(df_predict_ave,
              position = position_dodge(width = 0.5)) + 
   theme_bw() +
   labs(x = " ", 
-       y = expression(atop("Duration of provisioning visit", "(log (x+1) sec)"))) + 
+       y = expression(atop("Duration of provisioning visit", "(ln (x+1) sec)"))) + 
   theme(axis.title.x = element_blank(),
         axis.title.y = element_text(family = "Arial", color = "black", size = 15),
         axis.text.x = element_text(family = "Arial", color = "black", size = 12),

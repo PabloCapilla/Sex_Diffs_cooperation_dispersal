@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2023/09/05
+#' Last update 2024-08-30
 #' 
 ###
 ###
@@ -143,7 +143,7 @@ table_distance <- table_distance00 %>%
 
 ##
 ## save table
-gtsave(table_distance, "./tables/TABLE S19 - Prospecting distance.html")
+gtsave(table_distance, "./tables/TABLE S10 - Prospecting distance.html")
 
 #####
 
