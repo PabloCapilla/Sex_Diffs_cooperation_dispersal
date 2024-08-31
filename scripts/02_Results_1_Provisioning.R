@@ -109,6 +109,16 @@ summary(full_model_cooperation)
 drop1(full_model_cooperation, test = "Chisq")
 
 ##
+## model brood age continuous variable
+data$ba_day_cont <- as.numeric(data$ba_day)
+table(data$ba_day)
+table(data$ba_day_cont)
+
+full_model_cooperation_brood_age_cont <- update(interaction_model_cooperation, 
+                                          .~.-age_cat : sex - ba_day + ba_day_cont)
+summary(full_model_cooperation_brood_age_cont)
+drop1(full_model_cooperation_brood_age_cont, test = "Chisq")
+##
 ##
 ##### Table of results S2 #####
 ##

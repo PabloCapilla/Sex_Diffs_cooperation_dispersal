@@ -3,7 +3,7 @@
 #' 
 #' Authors: Pablo Capilla-Lasheras
 #' 
-#' Last update 2024-08-30
+#' Last update 2024-08-31
 #' 
 ###
 ###
@@ -34,10 +34,15 @@ head(data)
 
 ## sample sizes
 nrow(data) # total obs
-length(unique(data$sub_id)) # number of subs
-length(unique(data$sub_id[data$sub_sex == 'M'])) # number of male subs
-length(unique(data$sub_id[data$sub_sex == 'F'])) # number of female subs
+table(data$sub_sex)
 
+# sample size per sex
+sex_table <- data %>% 
+  group_by(sub_id) %>% 
+  filter(row_number() == 1)
+
+nrow(sex_table)
+table(sex_table$sub_sex)
 
 ##
 ##
